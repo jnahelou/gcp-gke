@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=https://json.schemastore.org/catalog-info.json
+
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+# some metadata about the template itself
+metadata:
+  name: gke-gcp-lz
+  title: GKE Landing Zone
+  description: |
+    The GKE Landing Zone provides a smooth experience to deploy enterprise ready clusters
+  tags:
+    - iac
+  links:
+    - url: https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview
+      title: Autopilot Overview
+      icon: catalog
+
+spec:
+  owner: user:guest
+  type: deployment
+
+  parameters:
+    - title: Basic Configuration
+      required:
+        - env
+        - region
+      properties:
+        env:
+          title: Landing zone name
+          type: string
+          description: ""
+          pattern: "^([a-z0-9-]+)$"
+          ui:help: "Exemple: myapp-01"
+        region:
+          title: Google Cloud region
+          type: string
+          enum:
+            - europe-west1
+            - europe-west4
+            - us-east1
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: github.com?repo=gcp-gke&owner=jnahelou
+        values:
+          parameters: ${{ parameters }}
+          template: ${{ steps.lookup.output.entity }}
+
+    - id: publish
+      name: Publish
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?repo=gcp-gke&owner=jnahelou
+        title: "[Backstage] New build request dpl-${{ parameters.env }}"
+        branchName: dpl-${{ parameters.env }}
+        description: |
+          Please review, approve and merge this PR if deployment is successful.
+        targetPath: env
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        catalogInfoUrl: https://github.com/jnahelou/gcp-gke/blob/dpl-${{ parameters.env }}/env/${{ parameters.env }}-catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
+    text:
+      - title: Deployment information
+        content: |
+          **Successfully** created landing zone ${{ parameters.env }}
