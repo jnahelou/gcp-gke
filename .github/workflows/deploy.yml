@@ -1,0 +1,64 @@
+---
+name: Deploy
+on:
+  push:
+    branches:
+      - 'dpl-*'
+
+  workflow_dispatch:
+    inputs:
+      destroy_run:
+        description: 'Set to true to convert plan run to a plan destroy run'
+        default: false
+        type: boolean
+        required: true
+
+env:
+  TF_IN_AUTOMATION: true
+  TF_INPUT: 0
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Config::SetEnv
+        run: |
+          TARGET=$GITHUB_REF_NAME
+          echo "TARGET=$TARGET" >> $GITHUB_ENV
+          echo "# $TARGET deployment summary"  >> $GITHUB_STEP_SUMMARY
+          TF_CLI_ARGS_plan="--var-file=env/${TARGET}.tfvars"
+          if [[ "${{ inputs.destroy_run}}" == "true" ]]; then
+            TF_CLI_ARGS_plan="$TF_CLI_ARGS_plan -destroy"
+          fi
+          echo "TF_CLI_ARGS_plan=$TF_CLI_ARGS_plan" >> $GITHUB_ENV
+
+      - name: Setup::Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+          terraform_version: 1.2.4
+
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: 'gcp-onboard-jnu'
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          export_environment_variables: true
+
+            
+      - name: Terraform::init
+        run: |
+          terraform init
+          terraform workspace select $TARGET || terraform workspace new $TARGET
+
+      - name: Terraform::plan
+        run: |    
+          set -o pipefail
+          echo '## :construction: Terraform plan summary'  >> $GITHUB_STEP_SUMMARY
+          echo ''  >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          terraform plan -no-color -out=terraform.tfplan | tee -a $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          terraform show -json terraform.tfplan > terraform.tfplan.json
