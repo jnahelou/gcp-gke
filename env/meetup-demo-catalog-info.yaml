@@ -1,0 +1,52 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: meetup-demo
+spec:
+  owner: guests
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: meetup-demo
+spec:
+  type: landing-zone
+  lifecycle: production
+  owner: guests
+  dependsOn:
+    - resource:default/meetup-demo-gke
+    - resource:default/meetup-demo-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: meetup-demo-project
+  description: Google Cloud project used to host meetup-demo resources.
+spec:
+  type: google_project
+  owner: guests
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: meetup-demo-gke
+  description: GKE Autopilot cluster used to host meetup-demo applications.
+spec:
+  type: google_container_cluster
+  owner: guests
+  dependsOn:
+    - resource:default/meetup-demo-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: meetup-demo-gke--customer
+  description: K8S namespace used to host meetup-demo resources.
+spec:
+  type: kubernetes_namespace
+  owner: guests
+  dependsOn:
+    - resource:default/meetup-demo-gke
