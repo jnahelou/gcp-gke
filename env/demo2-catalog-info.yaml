@@ -1,0 +1,61 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: demo2
+spec:
+  owner: group:admin
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo2
+  annotations:
+    github.com/project-slug: jnahelou/gcp-gke
+    backstage.io/techdocs-ref: url:https://github.com/jnahelou/gcp-gke/tree/
+  tags:
+    - landing-zone
+  links:
+    - url: https://github.com/jnahelou/gcp-gke
+      title: Root epository url
+      icon: catalog
+spec:
+  type: landing-zone
+  lifecycle: production
+  owner: group:admin
+  dependsOn:
+    - resource:default/demo2-gke
+    - resource:default/demo2-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: demo2-project
+  description: Google Cloud project used to host demo2 resources.
+spec:
+  type: google_project
+  owner: group:admin
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: demo2-gke
+  description: GKE Autopilot cluster used to host demo2 applications.
+spec:
+  type: google_container_cluster
+  owner: group:admin
+  dependsOn:
+    - resource:default/demo2-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: demo2-gke--customer
+  description: K8S namespace used to host demo2 resources.
+spec:
+  type: kubernetes_namespace
+  owner: group:admin
+  dependsOn:
+    - resource:default/demo2-gke
