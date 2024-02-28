@@ -9,6 +9,7 @@
  *
  * The modular structure of the code allows for easy customization and scalability, accommodating various configurations to meet specific project requirements. Whether deploying a new landing zone or updating an existing one, this Terraform code streamlines the process, providing a comprehensive and efficient solution for managing the GCP landing zone's foundational elements. Refer to the accompanying documentation for detailed instructions on utilizing and adapting the Terraform code to suit your organization's needs.
  *
+ * ![](docs/architecture.png)
  */
 
 terraform {
