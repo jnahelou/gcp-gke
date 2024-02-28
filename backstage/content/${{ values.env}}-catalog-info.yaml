@@ -15,6 +15,7 @@ metadata:
   annotations:
     github.com/project-slug: jnahelou/gcp-gke
     backstage.io/techdocs-ref: url:https://github.com/jnahelou/gcp-gke/tree/
+    jira/project-key: DB
   tags:
     - landing-zone
   links:
