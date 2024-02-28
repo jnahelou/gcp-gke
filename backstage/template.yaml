@@ -16,7 +16,7 @@ metadata:
       icon: catalog
 
 spec:
-  owner: user:guest
+  owner: group:admin
   type: deployment
 
   parameters:

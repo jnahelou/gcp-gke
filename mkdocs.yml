@@ -1,0 +1,8 @@
+site_name: GCP GKE
+site_description: Simple GKE autopilot landingzone
+
+nav:
+  - Introduction: index.md
+
+plugins:
+  - techdocs-core
