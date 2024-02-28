@@ -14,6 +14,7 @@ metadata:
   name: demo2
   annotations:
     github.com/project-slug: jnahelou/gcp-gke
+    "jira/project-key": DB
     backstage.io/techdocs-ref: url:https://github.com/jnahelou/gcp-gke/tree/
   tags:
     - landing-zone
@@ -25,6 +26,7 @@ spec:
   type: landing-zone
   lifecycle: production
   owner: group:admin
+  system: demo2
   dependsOn:
     - resource:default/demo2-gke
     - resource:default/demo2-project
