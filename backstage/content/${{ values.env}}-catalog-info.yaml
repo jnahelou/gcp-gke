@@ -24,6 +24,7 @@ metadata:
 spec:
   type: landing-zone
   lifecycle: production
+  system: ${{ values.env }}
   owner: group:admin
   dependsOn:
     - resource:default/${{ values.env }}-gke
