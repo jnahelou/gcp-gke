@@ -1,0 +1,63 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ademo
+spec:
+  owner: group:admin
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ademo
+  annotations:
+    github.com/project-slug: jnahelou/gcp-gke
+    backstage.io/techdocs-ref: url:https://github.com/jnahelou/gcp-gke/tree/
+    jira/project-key: DB
+  tags:
+    - landing-zone
+  links:
+    - url: https://github.com/jnahelou/gcp-gke
+      title: Root epository url
+      icon: catalog
+spec:
+  type: landing-zone
+  lifecycle: production
+  system: ademo
+  owner: group:admin
+  dependsOn:
+    - resource:default/ademo-gke
+    - resource:default/ademo-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ademo-project
+  description: Google Cloud project used to host ademo resources.
+spec:
+  type: google_project
+  owner: group:admin
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ademo-gke
+  description: GKE Autopilot cluster used to host ademo applications.
+spec:
+  type: google_container_cluster
+  owner: group:admin
+  dependsOn:
+    - resource:default/ademo-project
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ademo-gke--customer
+  description: K8S namespace used to host ademo resources.
+spec:
+  type: kubernetes_namespace
+  owner: group:admin
+  dependsOn:
+    - resource:default/ademo-gke
